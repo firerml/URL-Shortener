@@ -10,6 +10,7 @@ from django.db import migrations
 def create_admin_user(apps, schema_editor):
     admin_user = User.objects.create(username='admin', is_staff=True, is_superuser=True)
     while True:
+        print('\n\n\nCreating superuser for admin page with username admin.')
         password1 = getpass('\n\nPassword: ')
         password2 = getpass('Confirm password: ')
         if password1 == password2:

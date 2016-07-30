@@ -1,0 +1,20 @@
+<h1>Honey, I Shrunk The Url!</h1>
+
+{% if error %}
+    <p>Oops! {{ error }}</p>
+{% endif %}
+
+{% if new_url %}
+    <p>Awesome! We converted</p>
+    <p><a href="{{ original_url }}" target="_blank">{{ original_url }}</a>
+    <p>to</p>
+    <p><a href="{{ new_url }}" target="_blank">{{ new_url }}</a></p>
+
+    <h3>Keep shrinking?</h3>
+{% endif %}
+
+<form action="{% url 'index' %}" method="post">
+{% csrf_token %}
+    <input type='text' name='url' id='url-input' />
+    <input type='submit' value='SHRINK IT' />
+</form>

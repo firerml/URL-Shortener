@@ -24,6 +24,8 @@ SECRET_KEY = os.environ.get('URL_SHORTENER_DJANGO_SECRET_KEY', '%b-mz2@u8rh%cify
 
 ALLOWED_HOSTS = []
 
+APPEND_SLASH = True
+
 ENVIRONMENT = os.environ.get('URL_SHORTENER_ENVIRONMENT', 'dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -88,7 +90,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
-# No need for complicated password validation for this simple app.
+# No need for complicated password validation for this simple app, though we may want it later.
 # AUTH_PASSWORD_VALIDATORS = [
 #     {
 #         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
