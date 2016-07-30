@@ -38,6 +38,7 @@ def index(request):
         # No errors? Populate context for success message.
         context['original_url'] = url
         context['new_url'] = request.build_absolute_uri() + redirect_code_obj.code
+        context['url_length_difference'] = len(context['original_url']) - len(context['new_url'])
 
     return render(request, 'index.html', context=context)
 
