@@ -2,12 +2,7 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
-        <script type="text/javascript">
-            // This empty onload function forces the above CSS to not trigger until after onload.
-            // This avoids the Chrome bug that triggers animations on page load.
-            // http://stackoverflow.com/a/14416030
-            window.onload = function() {}
-        </script>
+        <script type="text/javascript" src="{% static 'script.js' %}"></script>
         <title>Shrinkify</title>
     </head>
     <body>
@@ -19,13 +14,16 @@
 
         {% if new_url %}
             <div id="success-message-container">
-                <p class="success-message">Awesome! We converted</p>
-                <p class="success-message"><a href="{{ original_url }}" target="_blank">{{ original_url }}</a>
-                <p class="success-message">to</p>
-                <p class="success-message"><a href="{{ new_url }}" target="_blank">{{ new_url }}</a> !</p>
+                <p class="success-message">Awesome!</p>
+                <p class="success-message"><a id="original-url" href="{{ original_url }}" target="_blank">{{ original_url }}</a>
+                <p class="success-message">was converted to</p>
+                <p class="success-message"><a id="new-url" href="{{ new_url }}" target="_blank">{{ new_url }}</a></p>
                 {% if url_length_difference %}
                     <p class="success-message">That's {{ url_length_difference }} fewer characters!</p>
                 {% endif %}
+
+                <!--This is an input and not a p or div to have exactly the same style as the other button-->
+                <input type="submit" id="copy-button" class="button" value="Copy New URL" />
             </div>
 
             <h3 class="subheader">Shrink Another!</h3>
@@ -33,8 +31,8 @@
 
         <form action="{% url 'index' %}" method="post">
         {% csrf_token %}
-            <input id="url-input" type="text" name="url" />
-            <input id="submit-button" type="submit" value="SHRINK IT" />
+            <input id="url-input" type="text" value="{{ input_value }}" name="url" />
+            <input id="submit-button" class="button" type="submit" value="SHRINK IT" />
         </form>
     </body>
 </html>

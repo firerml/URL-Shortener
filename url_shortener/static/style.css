@@ -10,13 +10,13 @@ body {
 }
 
 
-#url-input, #submit-button {
+#url-input, .button {
     width: 75%;
-    padding: 20px;
+    padding: 10px;
 	font-size: 16px;
 }
 
-#submit-button {
+.button {
     color: white;
     background-color: rgb(40,155,115);
 
@@ -32,7 +32,7 @@ body {
     -moz-transition: background-color .2s;
     -o-transition: background-color .2s;
 }
-#submit-button:hover {
+.button:hover {
     background-color: rgb(25,140,100);
 }
 

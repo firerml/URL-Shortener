@@ -9,11 +9,11 @@ from url_shortener.models import RedirectCode
 
 @require_http_methods(['GET', 'POST'])
 def index(request):
-    # As this app, for simplicity, doesn't use JavaScript, the home page and the shrinking are
-    # in the same endpoint to simulate a single-page application.
+    # As this app, for simplicity, doesn't use JavaScript (outside of the copying functionality),
+    # the home page and the shrinking are in the same endpoint to simulate a single-page application.
     # This is just to keep the page's URL clean; a separate POST endpoint rendering index.html would have
     # a different path, and to redirect with a success message would require a path or query params.
-    context = {}
+    context = {'input_value': ''}
     if request.method == 'POST':
         # Create a RedirectCode object and populate the context to display a success (or error) message.
         url = request.POST.get('url')
@@ -38,6 +38,7 @@ def index(request):
                     # There should be no other validation errors, so log it and show user a generic error message.
                     logging.info(e.message_dict)
                     context['error'] = 'An error has occurred. Contact firerml@gmail.com to report this bug!'
+                context['input_value'] = url
                 return render(request, 'index.html', context=context)
 
         # No errors? Populate context for success message.
