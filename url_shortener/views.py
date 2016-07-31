@@ -13,18 +13,20 @@ def index(request):
     # the home page and the shrinking are in the same endpoint to simulate a single-page application.
     # This is just to keep the page's URL clean; a separate POST endpoint rendering index.html would have
     # a different path, and to redirect with a success message would require a path or query params.
+    created = False
     context = {'input_value': ''}
     if request.method == 'POST':
         # Create a RedirectCode object and populate the context to display a success (or error) message.
         url = request.POST.get('url')
         if not url:
             context['error'] = 'URL cannot be blank!'
-            return render(request, 'index.html', context=context)
+            return render(request, 'index.html', context=context, status=400)
 
         # See if this URL has been used before.
         redirect_code_obj = RedirectCode.objects.filter(url=url).first()
         # If not, create a new RedirectCode object and validate it, preparing error messages if there are any.
         if not redirect_code_obj:
+            created = True
             redirect_code_obj = RedirectCode(url=url, code=RedirectCode.generate_code())
             try:
                 # Validate that the user-provided URL is in valid format.
@@ -39,14 +41,15 @@ def index(request):
                     logging.info(e.message_dict)
                     context['error'] = 'An error has occurred. Contact firerml@gmail.com to report this bug!'
                 context['input_value'] = url
-                return render(request, 'index.html', context=context)
+                return render(request, 'index.html', context=context, status=400)
 
         # No errors? Populate context for success message.
         context['original_url'] = url
         context['new_url'] = request.build_absolute_uri() + redirect_code_obj.code
         context['url_length_difference'] = max(len(context['original_url']) - len(context['new_url']), 0)
 
-    return render(request, 'index.html', context=context)
+    status = 201 if created else 200
+    return render(request, 'index.html', context=context, status=status)
 
 
 @require_http_methods(['GET'])
