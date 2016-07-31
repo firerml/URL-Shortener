@@ -1,21 +1,40 @@
-<h1>Honey, I Shrunk The Url!</h1>
+{% load staticfiles %}
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+        <script type="text/javascript">
+            // This empty onload function forces the above CSS to not trigger until after onload.
+            // This avoids the Chrome bug that triggers animations on page load.
+            // http://stackoverflow.com/a/14416030
+            window.onload = function() {}
+        </script>
+        <title>Shrinkify</title>
+    </head>
+    <body>
+        <h1 class="header">Honey, I Shrunk The URL!</h1>
 
-{% if error %}
-    <p>Oops! {{ error }}</p>
-{% endif %}
+        {% if error %}
+            <p id="error-message">Oops! {{ error }}</p>
+        {% endif %}
 
-{% if new_url %}
-    <p>Awesome! We converted</p>
-    <p><a href="{{ original_url }}" target="_blank">{{ original_url }}</a>
-    <p>to</p>
-    <p><a href="{{ new_url }}" target="_blank">{{ new_url }}</a></p>
-    <p>That's {{ url_length_difference }} fewer characters!</p>
+        {% if new_url %}
+            <div id="success-message-container">
+                <p class="success-message">Awesome! We converted</p>
+                <p class="success-message"><a href="{{ original_url }}" target="_blank">{{ original_url }}</a>
+                <p class="success-message">to</p>
+                <p class="success-message"><a href="{{ new_url }}" target="_blank">{{ new_url }}</a> !</p>
+                {% if url_length_difference %}
+                    <p class="success-message">That's {{ url_length_difference }} fewer characters!</p>
+                {% endif %}
+            </div>
 
-    <h3>Keep shrinking?</h3>
-{% endif %}
+            <h3 class="subheader">Shrink Another!</h3>
+        {% endif %}
 
-<form action="{% url 'index' %}" method="post">
-{% csrf_token %}
-    <input type='text' name='url' id='url-input' />
-    <input type='submit' value='SHRINK IT' />
-</form>
+        <form action="{% url 'index' %}" method="post">
+        {% csrf_token %}
+            <input id="url-input" type="text" name="url" />
+            <input id="submit-button" type="submit" value="SHRINK IT" />
+        </form>
+    </body>
+</html>

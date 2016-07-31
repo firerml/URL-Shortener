@@ -17,6 +17,10 @@ def index(request):
     if request.method == 'POST':
         # Create a RedirectCode object and populate the context to display a success (or error) message.
         url = request.POST.get('url')
+        if not url:
+            context['error'] = 'URL cannot be blank!'
+            return render(request, 'index.html', context=context)
+
         # See if this URL has been used before.
         redirect_code_obj = RedirectCode.objects.filter(url=url).first()
         # If not, create a new RedirectCode object and validate it, preparing error messages if there are any.
@@ -29,16 +33,17 @@ def index(request):
             except ValidationError as e:
                 url_errors = e.message_dict.get('url')
                 if url_errors:
-                    context['error'] = url_errors[0] + ' (Did you leave out the http/https? =) )'
+                    context['error'] = url_errors[0] + ' (Did you forget the http/https?)'
                 else:
                     # There should be no other validation errors, so log it and show user a generic error message.
                     logging.info(e.message_dict)
                     context['error'] = 'An error has occurred. Contact firerml@gmail.com to report this bug!'
+                return render(request, 'index.html', context=context)
 
         # No errors? Populate context for success message.
         context['original_url'] = url
         context['new_url'] = request.build_absolute_uri() + redirect_code_obj.code
-        context['url_length_difference'] = len(context['original_url']) - len(context['new_url'])
+        context['url_length_difference'] = max(len(context['original_url']) - len(context['new_url']), 0)
 
     return render(request, 'index.html', context=context)
 
