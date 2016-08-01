@@ -34,7 +34,7 @@ class PostIndexTestCase(TestCase):
         res = self.post_with_url(url)
         self.assertEqual(res.context.get('original_url'), url)
         code = RedirectCode.objects.first().code
-        self.assertEqual(res.context.get('new_url'), 'http://testserver/' + code)
+        self.assertEqual(res.context.get('new_url'), 'localhost:5000/c/' + code)
 
     def test_invalid_urls_return_400_and_do_not_create_redirect_codes(self):
         start_count = RedirectCode.objects.count()
@@ -94,6 +94,6 @@ class RedirectFromCodeTestCase(TestCase):
         self.redirect_code = RedirectCode.objects.create(url='http://example.com', code='abc')
 
     def test_valid_redirect_code_redirects(self):
-        res = self.client.get('/{}/'.format(self.redirect_code.code))
+        res = self.client.get('/c/{}/'.format(self.redirect_code.code))
         self.assertEqual(res['location'], self.url)
         self.assertEqual(res.status_code, 302)
