@@ -22,7 +22,7 @@ class RedirectCode(models.Model):
         )
 
     def get_short_url(self):
-        return '{}/{}'.format(settings.DOMAIN, self.code)
+        return '{}/c/{}'.format(settings.DOMAIN, self.code)
 
     @staticmethod
     def generate_code():
