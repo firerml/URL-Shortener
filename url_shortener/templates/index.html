@@ -17,7 +17,7 @@
                 <p class="success-message">Awesome!</p>
                 <p class="success-message"><a id="original-url" href="{{ original_url }}" target="_blank">{{ original_url }}</a>
                 <p class="success-message">was converted to</p>
-                <p class="success-message"><a id="new-url" href="{{ new_url }}" target="_blank">{{ new_url }}</a></p>
+                <p class="success-message"><a id="new-url" href="http://{{ new_url }}" target="_blank">{{ new_url }}</a></p>
                 {% if url_length_difference %}
                     <p class="success-message">That's {{ url_length_difference }} fewer characters!</p>
                 {% endif %}
@@ -30,7 +30,6 @@
         {% endif %}
 
         <form action="{% url 'index' %}" method="post">
-        {% csrf_token %}
             <input id="url-input" type="text" value="{{ input_value }}" name="url" />
             <input id="submit-button" class="button" type="submit" value="SHRINK IT" />
         </form>

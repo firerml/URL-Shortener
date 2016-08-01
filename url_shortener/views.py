@@ -1,6 +1,4 @@
-import logging
-
-from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
@@ -8,54 +6,67 @@ from url_shortener.models import RedirectCode
 
 
 @require_http_methods(['GET', 'POST'])
-def index(request):
+def index(request, return_json=False):
     # As this app, for simplicity, doesn't use JavaScript (outside of the copying functionality),
     # the home page and the shrinking are in the same endpoint to simulate a single-page application.
     # This is just to keep the page's URL clean; a separate POST endpoint rendering index.html would have
     # a different path, and to redirect with a success message would require a path or query params.
-    created = False
-    context = {'input_value': ''}
+    context = {'error': ''}
+    status = 200
     if request.method == 'POST':
         # Create a RedirectCode object and populate the context to display a success (or error) message.
         url = request.POST.get('url')
-        if not url:
-            context['error'] = 'URL cannot be blank!'
+        redirect_code_data = RedirectCode.get_or_create_from_url(url)
+
+        if redirect_code_data['error']:
+            # Display what the user last typed in the input box so the user can fix it.
+            context['input_value'] = url
+            context['error'] = redirect_code_data['error']
+            if return_json:
+                return JsonResponse(context, status=400)
             return render(request, 'index.html', context=context, status=400)
 
-        # See if this URL has been used before.
-        redirect_code_obj = RedirectCode.objects.filter(url=url).first()
-        # If not, create a new RedirectCode object and validate it, preparing error messages if there are any.
-        if not redirect_code_obj:
-            created = True
-            redirect_code_obj = RedirectCode(url=url, code=RedirectCode.generate_code())
-            try:
-                # Validate that the user-provided URL is in valid format.
-                redirect_code_obj.full_clean()
-                redirect_code_obj.save()
-            except ValidationError as e:
-                url_errors = e.message_dict.get('url')
-                if url_errors:
-                    context['error'] = url_errors[0] + ' (Did you forget the http/https?)'
-                else:
-                    # There should be no other validation errors, so log it and show user a generic error message.
-                    logging.info(e.message_dict)
-                    context['error'] = 'An error has occurred. Contact firerml@gmail.com to report this bug!'
-                context['input_value'] = url
-                return render(request, 'index.html', context=context, status=400)
-
         # No errors? Populate context for success message.
+        redirect_code_obj = redirect_code_data['redirect_code_object']
         context['original_url'] = url
-        context['new_url'] = request.build_absolute_uri() + redirect_code_obj.code
+        context['new_url'] = redirect_code_obj.get_short_url()
         context['url_length_difference'] = max(len(context['original_url']) - len(context['new_url']), 0)
+        context['redirect_code'] = redirect_code_obj.code
+        if redirect_code_data['created']:
+            status = 201
 
-    status = 201 if created else 200
+    if return_json:
+        context.pop('input_value', '')
+        return JsonResponse(context, status=status)
+
+    # Wipe the input box on successful input.
+    context['input_value'] = ''
     return render(request, 'index.html', context=context, status=status)
 
 
 @require_http_methods(['GET'])
-def redirect_from_code(request, code):
-    # TODO: HTTP caching.
+def redirect_from_code(request, code, return_json=False):
     redirect_code = RedirectCode.objects.filter(code=code).first()
     if not redirect_code:
-        return redirect(index)
+        if return_json:
+            return JsonResponse({'error': 'Code does not exist.'}, status=400)
+        else:
+            return redirect(index)
+    if return_json:
+        return JsonResponse({
+            'error': '',
+            'original_url': redirect_code.url,
+            'short_url': redirect_code.get_short_url(),
+            'code': redirect_code.code
+        }, status=404)
     return redirect(redirect_code.url)
+
+
+@require_http_methods(['GET'])
+def api_get_redirect_code(request, code):
+    return redirect_from_code(request, code, return_json=True)
+
+
+@require_http_methods(['POST'])
+def api_create_redirect_code(request):
+    return index(request, return_json=True)
