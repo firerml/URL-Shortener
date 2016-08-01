@@ -20,10 +20,10 @@ def index(request, return_json=False):
 
         if redirect_code_data['error']:
             # Display what the user last typed in the input box so the user can fix it.
-            context['input_value'] = url
             context['error'] = redirect_code_data['error']
             if return_json:
                 return JsonResponse(context, status=400)
+            context['input_value'] = url
             return render(request, 'index.html', context=context, status=400)
 
         # No errors? Populate context for success message.
@@ -61,6 +61,12 @@ def redirect_from_code(request, code, return_json=False):
         }, status=404)
     return redirect(redirect_code.url)
 
+
+#######
+# API #
+#######
+
+# All of the logic except the final return format is identical to logic found above, so no need to replicate it.
 
 @require_http_methods(['GET'])
 def api_get_redirect_code(request, code):

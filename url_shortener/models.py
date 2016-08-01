@@ -45,7 +45,6 @@ class RedirectCode(models.Model):
     class Meta:
         db_table = 'redirect_code'
 
-
     @staticmethod
     def get_or_create_from_url(url):
         """
