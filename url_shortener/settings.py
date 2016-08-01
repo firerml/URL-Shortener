@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'url_shortener.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://mike:@localhost:5432/url_shortener'),
+    'default': dj_database_url.config(default='postgres://url_shortener:@localhost:5432/url_shortener'),
 }
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 DATABASES['default']['CONN_MAX_AGE'] = None
