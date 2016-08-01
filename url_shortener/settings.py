@@ -31,12 +31,13 @@ APPEND_SLASH = True
 ENVIRONMENT = os.environ.get('URL_SHORTENER_ENVIRONMENT', 'dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENVIRONMENT == 'dev'
-
 if ENVIRONMENT == 'dev':
+    DEBUG = True
     DOMAIN = 'localhost:5000'
 else:
+    DEBUG = False
     DOMAIN = 'shrinker.herokuapp.com'
+    ALLOWED_HOSTS = ('shrinker.herokuapp.com',)
 
 # Application definition
 
